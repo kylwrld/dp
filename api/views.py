@@ -30,7 +30,13 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 class Login(APIView):
     def post(self, request, format=None):
-        user = get_object_or_404(User, username=request.data["username"])
+        if "username" in request.data:
+            user = get_object_or_404(User, username=request.data["username"])
+            print("a")
+        elif "email" in request.data:
+            user = get_object_or_404(User, email=request.data["email"])
+            print("b")
+
         if not user.check_password(request.data['password']):
             return Response({"detail":"Not found"}, status=status.HTTP_404_NOT_FOUND)
 
