@@ -35,6 +35,8 @@ class MyRefreshToken(RefreshToken):
         token = super().for_user(user)
         token['name'] = user.profile.name
         token['lastname'] = user.profile.lastname
+        token['username'] = user.username
+        token['email'] = user.email
 
         return token
 
