@@ -27,20 +27,26 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
+class MyRefreshToken(RefreshToken):
+    @classmethod
+    def for_user(cls, user):
+        token = super().for_user(user)
+        token['name'] = user.profile.name
+        token['lastname'] = user.profile.lastname
+
+        return token
 
 class Login(APIView):
     def post(self, request, format=None):
         if "username" in request.data:
             user = get_object_or_404(User, username=request.data["username"])
-            print("a")
         elif "email" in request.data:
             user = get_object_or_404(User, email=request.data["email"])
-            print("b")
 
         if not user.check_password(request.data['password']):
             return Response({"detail":"Not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        tokens = RefreshToken().for_user(user)
+        tokens = MyRefreshToken().for_user(user)
         tokens_obj = {
             "refresh": str(tokens),
             "access": str(tokens.access_token),
@@ -60,15 +66,16 @@ class Signup(APIView):
             user.set_password(request.data['password'])
             user.save()
 
-            profile = Profile.objects.create(user=user, name=request.data['name'], lastname=request.data['lastname'])
+            Profile.objects.create(user=user, name=request.data['name'], lastname=request.data['lastname'])
 
-            refresh = RefreshToken.for_user(user)
+            refresh = MyRefreshToken.for_user(user)
             
             data = {
                 "refresh":str(refresh),
                 "access":str(refresh.access_token),
                 "user": serializer.data,
             }
+            
             return Response(data=data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
