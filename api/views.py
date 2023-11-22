@@ -13,6 +13,8 @@ from rest_framework_simplejwt.tokens import Token, AccessToken, RefreshToken
 
 from .serializers import TaskSerializer, UserSerializer, ProfileSerializer
 from .models import Task, Profile
+import datetime
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -84,11 +86,16 @@ class Signup(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TaskView(APIView):
-    permission_classes = [IsAuthenticated]
     serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
     state = ['urgencia', 'pendente', 'concluido']
+    timedelta = datetime.timedelta(hours=-3)
+    timezone = datetime.timezone(timedelta, "America/Sao_Paulo")
 
     def post(self, request, format=None):
+        if request.data['worklist'] == True and len(Task.objects.filter(user=request.user, worklist=True)) == 3:
+            self.worklist_swap(request)
+
         if request.data['state'].lower() not in self.state:
             return Response({"detail":"bad request"} ,status=status.HTTP_400_BAD_REQUEST)
 
@@ -105,15 +112,30 @@ class TaskView(APIView):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
     def put(self, request, pk, format=None):
+        if "worklist" in request.data and request.data['worklist'] == True and len(Task.objects.filter(user=request.user, worklist=True)) == 3:
+            self.worklist_swap(request)
+
         task = Task.objects.get(user=request.user, pk=pk)
         serializer = TaskSerializer(task, data=request.data)
+        print(serializer)
         if serializer.is_valid():
             serializer.save()
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
-        return Response(serializer.erros, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, pk, format=None):
         task = get_object_or_404(Task, user=request.user, pk=pk)
         task.delete()
         return Response(data={"detailt":"Item successfully deleted"}, status=status.HTTP_202_ACCEPTED)
+    
+    def worklist_swap(self, request):
+        worklist = Task.objects.filter(user=request.user, worklist=True)
+        min = worklist[0].worklist_date
+        j = 0
+        for i in range(len(worklist)):
+            if worklist[i].worklist_date < min:
+                min = worklist[i].worklist_date
+                j = i
+        worklist[j].worklist = False
+        worklist[j].save()

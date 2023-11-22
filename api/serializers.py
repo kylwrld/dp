@@ -5,7 +5,8 @@ from .models import Task, Profile
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['id', 'title', 'task_content', 'state', 'worklist', 'date']
+        fields = ['id', 'title', 'task_content', 'state', 'worklist', 'date', 'worklist_date']
+        extra_kwargs = {'title': {'required': False}, 'task_content':{'required':False}}
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:

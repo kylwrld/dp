@@ -11,6 +11,7 @@ class Task(models.Model):
     created = models.DateTimeField(editable=False)
     modified = models.DateTimeField(null=True)
     date = models.DateTimeField('date', default=None, null=True, blank=True)
+    worklist_date = models.DateTimeField('worklist_date', default=None, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.title
