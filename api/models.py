@@ -10,6 +10,7 @@ class Task(models.Model):
     worklist = models.BooleanField(default=False)
     created = models.DateTimeField(editable=False)
     modified = models.DateTimeField(null=True)
+    date = models.DateField('date', default=None, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.title

@@ -89,7 +89,6 @@ class TaskView(APIView):
     state = ['urgencia', 'pendente', 'concluido']
 
     def post(self, request, format=None):
-
         if request.data['state'].lower() not in self.state:
             return Response({"detail":"bad request"} ,status=status.HTTP_400_BAD_REQUEST)
 
