@@ -101,7 +101,9 @@ class TaskView(APIView):
 
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
+            print(serializer.validated_data)
             serializer.save(user=request.user)
+            print(serializer.data)
             return Response({"detail": "approved", "result": serializer.data}, status=status.HTTP_201_CREATED)
         
         return Response({"detail": "not approved"}, status=status.HTTP_400_BAD_REQUEST)
@@ -113,11 +115,11 @@ class TaskView(APIView):
     
     def put(self, request, pk, format=None):
         if "worklist" in request.data and request.data['worklist'] == True and len(Task.objects.filter(user=request.user, worklist=True)) == 3:
-            self.worklist_swap(request)
+            if Task.objects.get(user=request.user, pk=pk) not in Task.objects.filter(user=request.user, worklist=True):
+                self.worklist_swap(request)
 
         task = Task.objects.get(user=request.user, pk=pk)
         serializer = TaskSerializer(task, data=request.data)
-        print(serializer)
         if serializer.is_valid():
             serializer.save()
             return Response(data=serializer.data, status=status.HTTP_200_OK)
