@@ -15,6 +15,15 @@ class TaskSerializer(serializers.ModelSerializer):
         
         return super(TaskSerializer, self).update(instance, validated_data)
 
+    def create(self, validated_data):
+        obj = Task(**validated_data)
+        if validated_data.get("worklist", False) == True:
+            obj.worklist_date = timezone.now()
+            obj.save()
+            return obj
+        obj.save()
+        return obj
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
