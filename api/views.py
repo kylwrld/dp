@@ -114,7 +114,7 @@ class TaskView(APIView):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
     def put(self, request, pk, format=None):
-        if "worklist" in request.data and request.data['worklist'] == True and len(Task.objects.filter(user=request.user, worklist=True)) == 3:
+        if "worklist" in request.data and request.data["worklist"] == "true" and len(Task.objects.filter(user=request.user, worklist=True)) == 3:
             if Task.objects.get(user=request.user, pk=pk) not in Task.objects.filter(user=request.user, worklist=True):
                 self.worklist_swap(request)
 
