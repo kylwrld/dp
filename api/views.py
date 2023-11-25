@@ -93,7 +93,7 @@ class TaskView(APIView):
     timezone = datetime.timezone(timedelta, "America/Sao_Paulo")
 
     def post(self, request, format=None):
-        if request.data['worklist'] == True and len(Task.objects.filter(user=request.user, worklist=True)) == 3:
+        if request.data['worklist'] == "true" and len(Task.objects.filter(user=request.user, worklist=True)) == 3:
             self.worklist_swap(request)
 
         if request.data['state'].lower() not in self.state:
