@@ -101,9 +101,7 @@ class TaskView(APIView):
 
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
-            print(serializer.validated_data)
             serializer.save(user=request.user)
-            print(serializer.data)
             return Response({"detail": "approved", "result": serializer.data}, status=status.HTTP_201_CREATED)
         
         return Response({"detail": "not approved"}, status=status.HTTP_400_BAD_REQUEST)
