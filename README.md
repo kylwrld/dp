@@ -1,4 +1,6 @@
-## Documentação da API
+# REST API - Nerve
+
+REST API feita para o trabalho de final de ano, projeto integrador, do terceiro ano do ensino médio integrado ao técnico do SENAC.
 
 #### Retorna todos os itens de um usuário
 
